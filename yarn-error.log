@@ -1,0 +1,78 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Users\Hp\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js
+
+PATH: 
+  C:\oraclexe\app\oracle\product\11.2.0\server\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Users\Hp\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Python 3.9;c:\users\hp\appdata\local\programs\python\python39\lib\site-packages;C:\Users\Hp\AppData\Local\Programs\Python\Python39\Scripts\;C:\users\hp\appdata\local\programs\python\python39\lib\site-packages;E:\c compiler\bin;E:\c compiler\mingw32\bin;C:\ProgramData\chocolatey\bin;C:\Program Files (x86)\NoteBook FanControl\;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\ProgramData\ComposerSetup\bin;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Program Files\Docker\Docker\resources\bin;C:\Users\Hp\AppData\Local\Programs\Python\Python39\Scripts\;C:\Users\Hp\AppData\Local\Programs\Python\Python39\;C:\Users\Hp\AppData\Local\Microsoft\WindowsApps;C:\Users\Hp\AppData\Local\Programs\Microsoft VS Code\bin;D:\c extension\mingw32\bin;C:\Program Files\heroku\bin;C:\MinGW\bin;C:\xampp\php;C:\src\flutter\bin;C:\Users\Hp\AppData\Local\ComposerSetup\bin;C:\Users\Hp\AppData\Roaming\npm;C:\Program Files\Java\jdk-18.0.1.1\bin;C:\Program Files\Java\jdk-17.0.3.1\bin;C:\Program Files\MongoDB\Server\5.0\bin;C:\Users\Hp\AppData\Roaming\Composer\vendor\bin
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  16.15.1
+
+Platform: 
+  win32 x64
+
+Trace: 
+  Error: ENOENT: no such file or directory, open 'C:\Users\Hp\AppData\Local\Yarn\Cache\v6\npm-mongodb-4.12.1-224eb39b8784af835b515aa687c6010cecaabb1a-integrity\node_modules\mongodb\.yarn-tarball.tgz'
+
+npm manifest: 
+  {
+    "name": "FMM",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+      "build": "tsc",
+      "clean": "npx rimraf ./build",
+      "start": "node build/server.js",
+      "zip": "tar.exe -a -c -f kaldari.zip build package.json config .platform .npmrc .ebextensions",
+      "deploy": "start deploy.bat",
+      "ebs": "start ebs.bat",
+      "dist": "sh ./scripts/build.sh",
+      "server": "tsc-watch --outDir ./build --onSuccess \"npm run start -- --mode=http\" --onFailure \"echo ERROR! Compilation Failed\""
+    },
+    "author": "Arpit Nakarani",
+    "license": "ISC",
+    "dependencies": {
+      "@aws-sdk/abort-controller": "^3.193.0",
+      "@aws-sdk/client-s3": "^3.194.0",
+      "@types/body-parser": "^1.19.2",
+      "@types/config": "^0.0.41",
+      "@types/cors": "^2.8.12",
+      "@types/express": "^4.17.13",
+      "aws-sdk": "^2.1114.0",
+      "axios": "^0.27.2",
+      "bcryptjs": "^2.4.3",
+      "config": "^3.3.7",
+      "cors": "^2.8.5",
+      "dotenv": "^16.0.3",
+      "express": "^4.18.1",
+      "http": "^0.0.1-security",
+      "joi": "^17.6.0",
+      "jsonwebtoken": "^8.5.1",
+      "moment-timezone": "^0.5.37",
+      "mongoose": "^6.4.1",
+      "multer": "^1.4.2",
+      "multer-s3": "^2.9.0",
+      "multer-s3-transform": "^2.10.3",
+      "node-gcm": "^1.0.5",
+      "nodemailer": "^6.7.8",
+      "sharp": "^0.30.7",
+      "winston": "^3.8.1"
+    },
+    "devDependencies": {
+      "@types/node": "^18.0.0",
+      "nodemon": "^2.0.18",
+      "rimraf": "^3.0.2",
+      "ts-node": "^10.8.1",
+      "tsc-watch": "^5.0.3",
+      "typescript": "^4.7.4"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
