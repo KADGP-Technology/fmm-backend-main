@@ -7,7 +7,6 @@ const router = express.Router();
 
 router.post('/verify/mobile',authController.mobile_verify);
 router.post("/verifyOtp", authController.otp_verification);
-router.post('/signUp',authController.signUp);
 router.post("/resend/otp", authController.resend_otp);
 router.post("/login" , authController.login);
 router.post('/signUp',authController.signUp);

@@ -20,6 +20,7 @@ const specify_model_asper_role = (userType) => {
 
 export const mobile_verify = async (req: Request, res: Response) => { //mobile & usertype
     reqInfo(req)
+    console.log(req.body)
     let body = req.body,
         otp,
         otpFlag = 1, // OTP has already assign or not for cross-verification
@@ -181,8 +182,8 @@ export const resend_otp = async (req, res) => {
 
 export const signUp = async (req: Request, res: Response) => {
     reqInfo(req)
-    let body = req.body,
-        {user} = req.headers;
+    console.log(req.body)
+    let body = req.body;
     
     let model = specify_model_asper_role(body.userType);
     if (!model) return res.status(404).json(new apiResponse(404, "please provide appropriate userType", {}, {}));

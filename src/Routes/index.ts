@@ -5,7 +5,7 @@ import { adminRouter } from './admin'
 import { artistRouter } from './artist'
 import { uploadRouter } from './upload'
 import { userRouter } from './user'
-
+import { blogRouter } from './blog'
 
 
 const router = Router()
@@ -17,7 +17,7 @@ router.use('/user',userRouter)
 router.use('/artist',artistRouter)
 router.use('/admin',adminRouter)
 router.use('/upload', uploadRouter)
-
+router.use('/blog', blogRouter);
 
 
 
