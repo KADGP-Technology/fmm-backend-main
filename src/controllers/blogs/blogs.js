@@ -1,8 +1,10 @@
 const axios = require('axios');
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
+const {  email_verification_mail, reqInfo, responseMessage, sendSMS } = require('../../helper')
 
 exports.getAllblog = (req, res) => {
+    reqInfo(req);
     const response_data = []
     axios.get(`https://www.googleapis.com/blogger/v3/blogs/${process.env.BLOGER_ID}/posts?key=${process.env.BLOG_KEY}`)
             .then(function (response) {
