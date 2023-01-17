@@ -18,6 +18,61 @@ const specify_model_asper_role = (userType) => {
     return null;
 }
 
+export const mobile_verify_for_signup = async (req: Request, res: Response) => { //mobile & usertype
+    reqInfo(req)
+    console.log(req.body)
+    let body = req.body,
+        otp,
+        otpFlag = 1, // OTP has already assign or not for cross-verification
+        authToken = 0;
+        let model = specify_model_asper_role(body.userType);
+        if (!model) return res.status(404).json(new apiResponse(404, "please provide appropriate userType", {}, {}));
+        
+        const isAlreadyUser = await model.findOne({ phoneNumber: body?.phoneNumber, isPhoneVerified: true })
+
+        if(isAlreadyUser){
+            return res.json({status:302, message:"User is already registred"});
+        }
+        else{
+            try {
+                const isAlready = await model.findOne({ phoneNumber: body?.phoneNumber, isActive: true })
+                if(isAlready?.isPhoneVerified == false) {
+                  const data2 =  await model.findOneAndDelete({ phoneNumber: body?.phoneNumber, isActive: true })
+                  console.log(data2);
+               }
+                   
+               if (isAlready?.isBlock == true) return res.status(403).json(new apiResponse(403, responseMessage?.accountBlock, {}, {}))
+             
+               let response = await new model(body).save()
+              
+               while (otpFlag == 1) {
+                   for (let flag = 0; flag < 1;) {
+                       otp = await Math.round(Math.random() * 1000000);
+                       if (otp.toString().length == 6) {
+                           flag++;
+                       }
+                   }
+                   let isAlreadyAssign = await model.findOne({ otp: otp });
+                   if (isAlreadyAssign?.otp != otp) otpFlag = 0;
+               }
+                //here send otp via sns ....
+                let result: any =  await sendSMS("91", response?.phoneNumber, `${SMS_message.OTP_verification} ${otp}`)
+                if (result) {
+                   // console.log(result);
+                   await model.findOneAndUpdate(body, { otp, otpExpireTime: new Date(new Date().setMinutes(new Date().getMinutes() + 10)) })
+                   return res.status(200).json(new apiResponse(200, `OTP send succesfully to ${response?.phoneNumber}`, {}, {}));
+               }
+               else return res.status(501).json(new apiResponse(501, responseMessage?.errorMail, {}, `${result}`));
+           
+           
+               } catch (error) {
+                   console.log(error);
+                   return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
+               }
+        } 
+}
+
+
 export const mobile_verify = async (req: Request, res: Response) => { //mobile & usertype
     reqInfo(req)
     console.log(req.body)
@@ -106,7 +161,7 @@ export const otp_verification = async (req: Request, res: Response) => { //phone
         body.isActive = true
     
         let data = await model.findOne(body);
-        if (!data) return res.status(400).json(new apiResponse(400, "Invalid otp or User does not exist!", {}, {}))
+        if (!data) return res.send({status:302, message:"OTP is not same"})
         if (data.isBlock == true) return res.status(403).json(new apiResponse(403, responseMessage?.accountBlock, {}, {}))
         if (new Date(data.otpExpireTime).getTime() < new Date().getTime()) return res.status(410).json(new apiResponse(410, responseMessage?.expireOTP, {}, {}))
         
@@ -205,6 +260,7 @@ export const signUp = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {  //phoneNumber only
     reqInfo(req)
+    console.log(req.body)
     let body = req.body,
         otp,
         otpFlag = 1, // OTP has already assign or not for cross-verification
@@ -216,13 +272,13 @@ export const login = async (req: Request, res: Response) => {  //phoneNumber onl
     try {
         // if(body.userType == 1) 
          response = await model.findOne({ phoneNumber: body?.phoneNumber, isActive: true  , isPhoneVerified : true });
-        if (!response) return res.status(404).json(new apiResponse(404, "Mobile Number Is Not Registerd!", {}, {}))
+        if (!response) return res.send({status:404, message:"Mobile Number Is Not Registerd!"})
 
-        if(body.userType == 1)
-        {
-           let check2 = await model.findOne({ phoneNumber: body?.phoneNumber, isActive: true  , isPhoneVerified : true , profileStatus : 4});
-            if (!check2) return res.status(405).json(new apiResponse(405, "Please Complete Signup First!", response, {}))
-        }
+        // if(body.userType == 1)
+        // {
+        //    let check2 = await model.findOne({ phoneNumber: body?.phoneNumber, isActive: true  , isPhoneVerified : true , profileStatus : 4});
+        //     if (!check2) return res.status(405).json(new apiResponse(405, "Please Complete Signup First!", response, {}))
+        // }
         
         if (response?.isBlock == true) return res.status(403).json(new apiResponse(403, responseMessage?.accountBlock, {}, {}))
 

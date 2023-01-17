@@ -5,11 +5,12 @@ const router = express.Router();
 
 
 
-router.post('/verify/mobile',authController.mobile_verify);
+// router.post('/verify/mobile/login',authController.mobile_verify);
+router.post('/verify/mobile',authController.mobile_verify_for_signup)
 router.post("/verifyOtp", authController.otp_verification);
 router.post("/resend/otp", authController.resend_otp);
 router.post("/login" , authController.login);
-router.post('/signUp',authController.signUp);
+router.post('/signUp',authController.signUp); // ---> for author or admin
 router.post("/auth/google" , authController.google_SL);
 router.post("/google/auth" , authController.google_SL)
 
