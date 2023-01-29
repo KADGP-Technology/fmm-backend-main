@@ -1,47 +1,40 @@
 import config from "config";
-const fetch = require("node-fetch");
+const request = require("request");
 
-async function sendSMS(PhoneNumber: any) {
-  const url = `https://api.exotel.in/v1/Accounts/${process.env.EXOTEL_SID}/Sms/send.json`;
-  const body = {
-    application_id: process.env.EXOTEL_APP_ID,
-    phone_number: PhoneNumber,
-  };
-   const response = await fetch(url, {
-    method: "POST",
-    body: JSON.stringify(body),
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Basic ${Buffer.from(
-        `${process.env.EXOTEL_SID}:${process.env.EXOTEL_TOKEN}`
-      ).toString("base64")}`,
-    },
-    });
-    const data = await response.json();
-    return data;
+const AccountSid = config.get("exotel.sid");
+function sendSMS(to, message,phoneNumber) {
+    // Set the Exotel API endpoint and your account SID and token
+    const exotelAPI = `https://api.exotel.com/v1/Accounts/${AccountSid}/Sms/send`;
+    const accountSid = 'YOUR_ACCOUNT_SID';
+    const token = 'YOUR_AUTH_TOKEN';
+
+    // Set the from, to, and message parameters for the API call
+    const options = {
+        url: exotelAPI,
+        method: 'POST',
+        headers: {
+            'AccountSid': accountSid,
+            'AuthToken': token,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        form: {
+            'From': phoneNumber,
+            'To': to,
+            'Body': message
+        }
+    };
+
+    // Send the API request
+    request(options, function (error, response, body) {
+        if (!error && response.statusCode === 200) {
+            console.log('SMS sent successfully.');
+        } else {
+            console.log('Error sending SMS: ' + error);
+        }
+    });
 }
 
-async function verifyOtp(otp: any) {
-  const url = `https://api.exotel.in/v1/Accounts/${process.env.EXOTEL_SID}/Sms/verify.json`;
-   const body = {
-    "otp": otp,
-   }
-    const response = await fetch(url, {
-    method: "POST",
-    body: JSON.stringify(body),
-    headers: {
-        "Content-Type": "application/json",
-        Authorization: `Basic ${Buffer.from(
-        `${process.env.EXOTEL_SID}:${process.env.EXOTEL_TOKEN}`
-        ).toString("base64")}`,
-    },
-    });
-    const data = await response.json();
-    return data;
-    
-}
-
-export { sendSMS, verifyOtp };
+export { sendSMS};
 
 
 
@@ -63,7 +56,7 @@ export { sendSMS, verifyOtp };
 
 
 
-
+//send otp using aws 
 // "use strict"
 // import config from 'config'
 // import AWS from 'aws-sdk'
@@ -157,3 +150,26 @@ export { sendSMS, verifyOtp };
 // //         }
 // //     });
 // // }
+
+
+
+// verify otp function in exotel
+//async function verifyOtp(otp: any) {
+    //   const url = `https://api.exotel.in/v1/Accounts/${process.env.EXOTEL_SID}/Sms/verify.json`;
+    //    const body = {
+    //     "otp": otp,
+    //    }
+    //     const response = await fetch(url, {
+    //     method: "POST",
+    //     body: JSON.stringify(body),
+    //     headers: {
+    //         "Content-Type": "application/json",
+    //         Authorization: `Basic ${Buffer.from(
+    //         `${process.env.EXOTEL_SID}:${process.env.EXOTEL_TOKEN}`
+    //         ).toString("base64")}`,
+    //     },
+    //     });
+    //     const data = await response.json();
+    //     return data;
+    
+    // }
