@@ -44,6 +44,7 @@ app.use(database_1.mongooseConnection);
 app.use(bodyParser.json({ limit: '200mb' }));
 app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
 const health = (req, res) => {
+    console.log("WELLLLL");
     return res.status(200).json({
         message: `FMM Server is Running, Server health is green`,
         app: packageInfo.name,
@@ -53,7 +54,7 @@ const health = (req, res) => {
         license: packageInfo.license
     });
 };
-const bad_gateway = (req, res) => { return res.status(502).json({ status: 502, message: "FMM Backend API Bad Gateway" }); };
+const bad_gateway = (req, res) => { return res.status(502).json({ status: 502, message: "FMM Badckend API Bad Gateway" }); };
 app.get('/', health);
 app.get('/health', health);
 app.get('/isServerUp', (req, res) => {

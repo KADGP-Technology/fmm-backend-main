@@ -6,8 +6,9 @@
     "scripts": {
         "build": "tsc",
         "clean": "npx rimraf ./build",
-        "start": "nodemon build/server.js",
+        "start": "node build/server.js",
         "zip": "tar.exe -a -c -f kaldari.zip build package.json config .platform .npmrc .ebextensions",
+        "dev": "nodemon  build/server.js",
         "deploy": "start deploy.bat",
         "ebs": "start ebs.bat",
         "dist": "sh ./scripts/build.sh",

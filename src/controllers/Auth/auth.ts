@@ -235,20 +235,31 @@ export const resend_otp = async (req, res) => {
     }
 }
 
+
 export const signUp = async (req: Request, res: Response) => {
     reqInfo(req)
-    console.log(req.body)
+    console.log("BODDDY",req.body,req.body.userType)
     let body = req.body;
-    
     let model = specify_model_asper_role(body.userType);
+    console.log('Model',model);
     if (!model) return res.status(404).json(new apiResponse(404, "please provide appropriate userType", {}, {}));
     try {
-        const salt = await bcryptjs.genSaltSync(10)
-        const hashPassword = await bcryptjs.hash(body.password, salt)
-        delete body.password
-        body.password = hashPassword
+        // const salt = await bcryptjs.genSaltSync(10)
+        // const hashPassword = await bcryptjs.hash(body.password, salt)
+        // delete body.password
+        // body.password = hashPassword
+        console.log("USSSER");
          let userData = await model.findOneAndUpdate({isActive : true , phoneNumber : body.phoneNumber , isPhoneVerified : true} , body , { new : true});
-        if(!userData) return res.status(404).json(new apiResponse(404 , "Bad Signup!" , {} , {}));
+        console.log("USERDATA",userData);
+        if(!userData){
+            const createUser = await new model(req.body).save()
+            console.log("CREATEUSER",createUser);
+            if(!createUser) return res.status(404).json(new apiResponse(400 , "Account Not Created" , {} , {}))
+            else{
+                res.status(200).json(new apiResponse(200, responseMessage?.signupSuccess, createUser, {}))
+            }
+        }
+        
      
         return res.status(200).json(new apiResponse(200, responseMessage?.signupSuccess, userData, {}))
        
@@ -258,6 +269,38 @@ export const signUp = async (req: Request, res: Response) => {
     }
 }
 
+
+// export const signUp = async (req: Request, res: Response) => {
+//     reqInfo(req)
+//     console.log("BODDDY",req.body,req.body.userType)
+//     let body = req.body;
+//     let model = specify_model_asper_role(body.userType);
+//     console.log('Model',model);
+//     if (!model) return res.status(404).json(new apiResponse(404, "please provide appropriate userType", {}, {}));
+//     try {
+//         const salt = await bcryptjs.genSaltSync(10)
+//         const hashPassword = await bcryptjs.hash(body.password, salt)
+//         delete body.password
+//         body.password = hashPassword
+//          let userData = await model.findOneAndUpdate({isActive : true , phoneNumber : body.phoneNumber , isPhoneVerified : true} , body , { new : true});
+//         console.log("USERDATA",userData);
+//         if(!userData){
+//             const createUser = await new model(req.body).save()
+//             console.log("CREATEUSER",createUser);
+//             if(!createUser) return res.status(404).json(new apiResponse(400 , "Account Not Created" , {} , {}))
+//             else{
+//                 res.status(200).json(new apiResponse(200, responseMessage?.signupSuccess, createUser, {}))
+//             }
+//         }
+        
+     
+//         return res.status(200).json(new apiResponse(200, responseMessage?.signupSuccess, userData, {}))
+       
+//     } catch (error) {
+//         console.log(error);
+//         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
+//     }
+// }
 export const login = async (req: Request, res: Response) => {  //phoneNumber only
     reqInfo(req)
     console.log(req.body)

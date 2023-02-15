@@ -16,6 +16,7 @@ const common_1 = require("../../common");
 const helper_1 = require("../../helper");
 const ObjectId = require('mongoose').Types.ObjectId;
 const updateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("BODDY", req.body);
     (0, helper_1.reqInfo)(req);
     let body = req.body, { user } = req.headers;
     console.log(user);

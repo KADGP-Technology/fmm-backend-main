@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.admin_otp_verification = exports.adminLogin = exports.adminSignUp = exports.google_SL = exports.login = exports.signUp = exports.resend_otp = exports.otp_verification = exports.mobile_verify = void 0;
+exports.admin_otp_verification = exports.adminLogin = exports.adminSignUp = exports.google_SL = exports.login = exports.signUp = exports.resend_otp = exports.otp_verification = exports.mobile_verify = exports.mobile_verify_for_signup = void 0;
 require('dotenv').config();
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
@@ -30,6 +30,56 @@ const specify_model_asper_role = (userType) => {
     // if (userType == 2) return adminModel;
     return null;
 };
+const mobile_verify_for_signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    (0, helper_1.reqInfo)(req);
+    console.log(req.body);
+    let body = req.body, otp, otpFlag = 1, // OTP has already assign or not for cross-verification
+    authToken = 0;
+    let model = specify_model_asper_role(body.userType);
+    if (!model)
+        return res.status(404).json(new common_1.apiResponse(404, "please provide appropriate userType", {}, {}));
+    const isAlreadyUser = yield model.findOne({ phoneNumber: body === null || body === void 0 ? void 0 : body.phoneNumber, isPhoneVerified: true });
+    if (isAlreadyUser) {
+        return res.json({ status: 302, message: "User is already registred" });
+    }
+    else {
+        try {
+            const isAlready = yield model.findOne({ phoneNumber: body === null || body === void 0 ? void 0 : body.phoneNumber, isActive: true });
+            if ((isAlready === null || isAlready === void 0 ? void 0 : isAlready.isPhoneVerified) == false) {
+                const data2 = yield model.findOneAndDelete({ phoneNumber: body === null || body === void 0 ? void 0 : body.phoneNumber, isActive: true });
+                console.log(data2);
+            }
+            if ((isAlready === null || isAlready === void 0 ? void 0 : isAlready.isBlock) == true)
+                return res.status(403).json(new common_1.apiResponse(403, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.accountBlock, {}, {}));
+            let response = yield new model(body).save();
+            while (otpFlag == 1) {
+                for (let flag = 0; flag < 1;) {
+                    otp = yield Math.round(Math.random() * 1000000);
+                    if (otp.toString().length == 6) {
+                        flag++;
+                    }
+                }
+                let isAlreadyAssign = yield model.findOne({ otp: otp });
+                if ((isAlreadyAssign === null || isAlreadyAssign === void 0 ? void 0 : isAlreadyAssign.otp) != otp)
+                    otpFlag = 0;
+            }
+            //here send otp via sns ....
+            let result = yield (0, helper_1.sendSMS)("91", response === null || response === void 0 ? void 0 : response.phoneNumber, `${common_1.SMS_message.OTP_verification} ${otp}`);
+            if (result) {
+                // console.log(result);
+                yield model.findOneAndUpdate(body, { otp, otpExpireTime: new Date(new Date().setMinutes(new Date().getMinutes() + 10)) });
+                return res.status(200).json(new common_1.apiResponse(200, `OTP send succesfully to ${response === null || response === void 0 ? void 0 : response.phoneNumber}`, {}, {}));
+            }
+            else
+                return res.status(501).json(new common_1.apiResponse(501, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.errorMail, {}, `${result}`));
+        }
+        catch (error) {
+            console.log(error);
+            return res.status(500).json(new common_1.apiResponse(500, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.internalServerError, {}, error));
+        }
+    }
+});
+exports.mobile_verify_for_signup = mobile_verify_for_signup;
 const mobile_verify = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     (0, helper_1.reqInfo)(req);
     console.log(req.body);
@@ -115,7 +165,7 @@ const otp_verification = (req, res) => __awaiter(void 0, void 0, void 0, functio
         body.isActive = true;
         let data = yield model.findOne(body);
         if (!data)
-            return res.status(400).json(new common_1.apiResponse(400, "Invalid otp or User does not exist!", {}, {}));
+            return res.send({ status: 302, message: "OTP is not same" });
         if (data.isBlock == true)
             return res.status(403).json(new common_1.apiResponse(403, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.accountBlock, {}, {}));
         if (new Date(data.otpExpireTime).getTime() < new Date().getTime())
@@ -183,19 +233,29 @@ const resend_otp = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 exports.resend_otp = resend_otp;
 const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     (0, helper_1.reqInfo)(req);
-    console.log(req.body);
+    console.log("BODDDY", req.body, req.body.userType);
     let body = req.body;
     let model = specify_model_asper_role(body.userType);
+    console.log('Model', model);
     if (!model)
         return res.status(404).json(new common_1.apiResponse(404, "please provide appropriate userType", {}, {}));
     try {
-        const salt = yield bcryptjs_1.default.genSaltSync(10);
-        const hashPassword = yield bcryptjs_1.default.hash(body.password, salt);
-        delete body.password;
-        body.password = hashPassword;
+        // const salt = await bcryptjs.genSaltSync(10)
+        // const hashPassword = await bcryptjs.hash(body.password, salt)
+        // delete body.password
+        // body.password = hashPassword
+        console.log("USSSER");
         let userData = yield model.findOneAndUpdate({ isActive: true, phoneNumber: body.phoneNumber, isPhoneVerified: true }, body, { new: true });
-        if (!userData)
-            return res.status(404).json(new common_1.apiResponse(404, "Bad Signup!", {}, {}));
+        console.log("USERDATA", userData);
+        if (!userData) {
+            const createUser = yield new model(req.body).save();
+            console.log("CREATEUSER", createUser);
+            if (!createUser)
+                return res.status(404).json(new common_1.apiResponse(400, "Account Not Created", {}, {}));
+            else {
+                res.status(200).json(new common_1.apiResponse(200, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.signupSuccess, createUser, {}));
+            }
+        }
         return res.status(200).json(new common_1.apiResponse(200, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.signupSuccess, userData, {}));
     }
     catch (error) {
@@ -204,8 +264,37 @@ const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.signUp = signUp;
+// export const signUp = async (req: Request, res: Response) => {
+//     reqInfo(req)
+//     console.log("BODDDY",req.body,req.body.userType)
+//     let body = req.body;
+//     let model = specify_model_asper_role(body.userType);
+//     console.log('Model',model);
+//     if (!model) return res.status(404).json(new apiResponse(404, "please provide appropriate userType", {}, {}));
+//     try {
+//         const salt = await bcryptjs.genSaltSync(10)
+//         const hashPassword = await bcryptjs.hash(body.password, salt)
+//         delete body.password
+//         body.password = hashPassword
+//          let userData = await model.findOneAndUpdate({isActive : true , phoneNumber : body.phoneNumber , isPhoneVerified : true} , body , { new : true});
+//         console.log("USERDATA",userData);
+//         if(!userData){
+//             const createUser = await new model(req.body).save()
+//             console.log("CREATEUSER",createUser);
+//             if(!createUser) return res.status(404).json(new apiResponse(400 , "Account Not Created" , {} , {}))
+//             else{
+//                 res.status(200).json(new apiResponse(200, responseMessage?.signupSuccess, createUser, {}))
+//             }
+//         }
+//         return res.status(200).json(new apiResponse(200, responseMessage?.signupSuccess, userData, {}))
+//     } catch (error) {
+//         console.log(error);
+//         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
+//     }
+// }
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     (0, helper_1.reqInfo)(req);
+    console.log(req.body);
     let body = req.body, otp, otpFlag = 1, // OTP has already assign or not for cross-verification
     authToken = 0, response;
     let model = specify_model_asper_role(body.userType);
@@ -215,12 +304,12 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         // if(body.userType == 1) 
         response = yield model.findOne({ phoneNumber: body === null || body === void 0 ? void 0 : body.phoneNumber, isActive: true, isPhoneVerified: true });
         if (!response)
-            return res.status(404).json(new common_1.apiResponse(404, "Mobile Number Is Not Registerd!", {}, {}));
-        if (body.userType == 1) {
-            let check2 = yield model.findOne({ phoneNumber: body === null || body === void 0 ? void 0 : body.phoneNumber, isActive: true, isPhoneVerified: true, profileStatus: 4 });
-            if (!check2)
-                return res.status(405).json(new common_1.apiResponse(405, "Please Complete Signup First!", response, {}));
-        }
+            return res.send({ status: 404, message: "Mobile Number Is Not Registerd!" });
+        // if(body.userType == 1)
+        // {
+        //    let check2 = await model.findOne({ phoneNumber: body?.phoneNumber, isActive: true  , isPhoneVerified : true , profileStatus : 4});
+        //     if (!check2) return res.status(405).json(new apiResponse(405, "Please Complete Signup First!", response, {}))
+        // }
         if ((response === null || response === void 0 ? void 0 : response.isBlock) == true)
             return res.status(403).json(new common_1.apiResponse(403, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.accountBlock, {}, {}));
         while (otpFlag == 1) {

@@ -11,6 +11,7 @@ const ObjectId = require('mongoose').Types.ObjectId
 
 export const updateProfile = async(req  :Request , res : Response) =>
 {
+    console.log("BODDY",req.body);
     reqInfo(req);
     let body = req.body,
         {user} : any = req.headers;

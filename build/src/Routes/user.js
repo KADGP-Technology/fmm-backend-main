@@ -7,11 +7,12 @@ exports.userRouter = void 0;
 const express_1 = __importDefault(require("express"));
 const controllers_1 = require("../controllers");
 const router = express_1.default.Router();
-router.post('/verify/mobile', controllers_1.authController.mobile_verify);
+// router.post('/verify/mobile/login',authController.mobile_verify);
+router.post('/verify/mobile', controllers_1.authController.mobile_verify_for_signup);
 router.post("/verifyOtp", controllers_1.authController.otp_verification);
 router.post("/resend/otp", controllers_1.authController.resend_otp);
 router.post("/login", controllers_1.authController.login);
-router.post('/signUp', controllers_1.authController.signUp);
+router.post('/signUp', controllers_1.authController.signUp); // ---> for author or admin
 router.post("/auth/google", controllers_1.authController.google_SL);
 router.post("/google/auth", controllers_1.authController.google_SL);
 // router.use(userJWT);
