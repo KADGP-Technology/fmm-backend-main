@@ -24,5 +24,7 @@ router.post("/artist/get/favourite", controllers_1.userController.get_favourite_
 router.get("/profile/update", controllers_1.userController.update_user_profile);
 router.get("/profile", controllers_1.userController.get_user_profile);
 // router.post("/logout" , authController.logout);
+//---------------------------- Dashboard -------------------------------------------//
+router.post("/artistProfile", controllers_1.userController.get_artist);
 exports.userRouter = router;
 //# sourceMappingURL=user.js.map

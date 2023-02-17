@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.get_favourite_artists = exports.mark_artist_favourite = exports.get_artist_pagination = void 0;
+exports.get_favourite_artists = exports.mark_artist_favourite = exports.get_artist = exports.get_artist_pagination = void 0;
 require('dotenv').config();
 const database_1 = require("../../database");
 const common_1 = require("../../common");
@@ -86,6 +86,18 @@ const get_artist_pagination = (req, res) => __awaiter(void 0, void 0, void 0, fu
     }
 });
 exports.get_artist_pagination = get_artist_pagination;
+//---------------------------- Dashboard -------------------------------------------//
+const get_artist = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("REQUESTT", req.body);
+    try {
+        const getArtist = yield database_1.artistModel.findById({ _id: req.body._id });
+        return res.status(200).json(new common_1.apiResponse(200, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.customMessage("Artist fetched"), getArtist, {}));
+    }
+    catch (error) {
+        return res.status(500).json(new common_1.apiResponse(500, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.internalServerError, {}, error));
+    }
+});
+exports.get_artist = get_artist;
 const mark_artist_favourite = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     (0, helper_1.reqInfo)(req);
     let { user } = req.headers, body = req.body, { createdFor, isFavourite } = req.body;

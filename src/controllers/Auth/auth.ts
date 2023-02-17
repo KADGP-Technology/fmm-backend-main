@@ -1,9 +1,10 @@
+import { artistBookingsModel } from './../../database/models/dashboard/artistBooking';
 "use strict"
 require('dotenv').config()
 import jwt from 'jsonwebtoken'
 import bcryptjs from 'bcryptjs'
 import { Request, Response } from 'express'
-import { adminModel, artistModel, userModel, userSessionModel } from '../../database'
+import { adminModel, artistBusinessLeadsModel, artistModel, userModel, userSessionModel } from '../../database'
 import { apiResponse, SMS_message } from '../../common'
 import {  email_verification_mail, reqInfo, responseMessage, sendSMS } from '../../helper'
 import axios from 'axios'
@@ -253,6 +254,31 @@ export const signUp = async (req: Request, res: Response) => {
         console.log("USERDATA",userData);
         if(!userData){
             const createUser = await new model(req.body).save()
+            if(createUser && (body.userType === 1)){    //very very important here to understand only artist is allowed to create account
+                const createBusinessLeads = await new artistBusinessLeadsModel().save()
+                if(createBusinessLeads){
+                    const createBookings = await new artistBookingsModel().save()
+
+                    if(createBookings){
+                        const updateArtist = await artistModel.findByIdAndUpdate({_id:createUser._id},{
+                            // $push:{businessLeads:createBusinessLeads._id,bookings:createBookings._id}
+                            businessLeads:createBusinessLeads._id,
+                            bookings:createBookings._id
+                        })
+                             if(updateArtist){
+                                const updateBusinessLeads =  await artistBusinessLeadsModel.findByIdAndUpdate({_id:createBusinessLeads._id},{
+                                artist:createUser._id
+                                })
+                                if(updateBusinessLeads){
+                                    const updateBookings =  await artistBookingsModel.findByIdAndUpdate({_id:createBookings._id},{
+                                        artist:createUser._id
+                                        })
+                                }
+                        }
+                    }
+                   
+                }
+            }
             console.log("CREATEUSER",createUser);
             if(!createUser) return res.status(404).json(new apiResponse(400 , "Account Not Created" , {} , {}))
             else{

@@ -62,6 +62,9 @@ const artistSchema = new mongoose.Schema({
     isActive: { type: Boolean, default: true },
     isBlock: { type: Boolean, default: false },
     isLoggedIn: { type: Boolean, defailt: false },
+    //dashBoard
+    businessLeads: { type: mongoose.Types.ObjectId, ref: "businessLeads" },
+    bookings: { type: mongoose.Types.ObjectId, ref: "bookings" }
 }, { timestamps: true });
 exports.artistModel = mongoose.model('artist', artistSchema);
 //# sourceMappingURL=artist.js.map

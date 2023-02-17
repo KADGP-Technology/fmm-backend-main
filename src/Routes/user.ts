@@ -29,9 +29,11 @@ router.get("/profile" , userController.get_user_profile);
 
 
 
+
 // router.post("/logout" , authController.logout);
 
-
+//---------------------------- Dashboard -------------------------------------------//
+router.post("/artistProfile" , userController.get_artist);
 
 
 export const userRouter = router;

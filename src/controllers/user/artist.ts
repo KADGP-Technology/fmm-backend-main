@@ -81,6 +81,21 @@ export const get_artist_pagination = async(req  :Request , res : Response) => {
 }
 
 
+//---------------------------- Dashboard -------------------------------------------//
+
+export const get_artist = async(req  :Request , res : Response) => {
+    console.log("REQUESTT",req.body);
+   try {
+    const getArtist = await artistModel.findById({_id:req.body._id})
+    return res.status(200).json(new apiResponse(200 ,responseMessage?.customMessage("Artist fetched") , getArtist  , {}));
+
+   } catch (error) {
+    return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
+
+   }
+}
+
+
 export const mark_artist_favourite = async(req  :Request , res : Response) => {
     reqInfo(req)
     let { user }  : any = req.headers,

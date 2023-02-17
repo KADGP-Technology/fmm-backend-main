@@ -13,6 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.admin_otp_verification = exports.adminLogin = exports.adminSignUp = exports.google_SL = exports.login = exports.signUp = exports.resend_otp = exports.otp_verification = exports.mobile_verify = exports.mobile_verify_for_signup = void 0;
+const artistBooking_1 = require("./../../database/models/dashboard/artistBooking");
+"use strict";
 require('dotenv').config();
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
@@ -249,6 +251,29 @@ const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         console.log("USERDATA", userData);
         if (!userData) {
             const createUser = yield new model(req.body).save();
+            if (createUser && (body.userType === 1)) { //very very important here to understand only artist is allowed to create account
+                const createBusinessLeads = yield new database_1.artistBusinessLeadsModel().save();
+                if (createBusinessLeads) {
+                    const createBookings = yield new artistBooking_1.artistBookingsModel().save();
+                    if (createBookings) {
+                        const updateArtist = yield database_1.artistModel.findByIdAndUpdate({ _id: createUser._id }, {
+                            // $push:{businessLeads:createBusinessLeads._id,bookings:createBookings._id}
+                            businessLeads: createBusinessLeads._id,
+                            bookings: createBookings._id
+                        });
+                        if (updateArtist) {
+                            const updateBusinessLeads = yield database_1.artistBusinessLeadsModel.findByIdAndUpdate({ _id: createBusinessLeads._id }, {
+                                artist: createUser._id
+                            });
+                            if (updateBusinessLeads) {
+                                const updateBookings = yield artistBooking_1.artistBookingsModel.findByIdAndUpdate({ _id: createBookings._id }, {
+                                    artist: createUser._id
+                                });
+                            }
+                        }
+                    }
+                }
+            }
             console.log("CREATEUSER", createUser);
             if (!createUser)
                 return res.status(404).json(new common_1.apiResponse(400, "Account Not Created", {}, {}));

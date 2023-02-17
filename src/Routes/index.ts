@@ -1,3 +1,4 @@
+
 "use strict"
 import { Request, Router, Response } from 'express'
 import { userStatus } from '../common'
@@ -6,6 +7,8 @@ import { artistRouter } from './artist'
 import { uploadRouter } from './upload'
 import { userRouter } from './user'
 import { blogRouter } from './blog'
+import { artistBusinessLeads} from './dashboard/businessLeads'
+import { artistBooking } from './dashboard/bookings'
 
 
 const router = Router()
@@ -18,6 +21,8 @@ router.use('/artist',artistRouter)
 router.use('/admin',adminRouter)
 router.use('/upload', uploadRouter)
 router.use('/blog', blogRouter);
+router.use('/businessLeads', artistBusinessLeads);
+router.use('/bookings', artistBooking);
 
 
 

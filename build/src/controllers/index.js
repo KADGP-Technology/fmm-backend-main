@@ -23,9 +23,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.artistController = exports.adminController = exports.authController = exports.userController = void 0;
+exports.artistDashboardBookings = exports.artistDashboardBusinessLeads = exports.artistController = exports.adminController = exports.authController = exports.userController = void 0;
 exports.userController = __importStar(require("./user/index"));
 exports.authController = __importStar(require("./Auth"));
 exports.adminController = __importStar(require("./admin"));
 exports.artistController = __importStar(require("./artist"));
+exports.artistDashboardBusinessLeads = __importStar(require("./dashboard"));
+exports.artistDashboardBookings = __importStar(require("./dashboard"));
 //# sourceMappingURL=index.js.map

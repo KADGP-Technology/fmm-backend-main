@@ -72,6 +72,10 @@ const artistSchema: any = new mongoose.Schema({
     isBlock: { type: Boolean, default: false },
     isLoggedIn : { type : Boolean , defailt : false},
 
+    //dashBoard
+    businessLeads:{type:mongoose.Types.ObjectId,ref:"businessLeads"},
+    bookings:{type:mongoose.Types.ObjectId,ref:"bookings"}
+
 }, { timestamps: true })
 
 export const artistModel = mongoose.model('artist', artistSchema);

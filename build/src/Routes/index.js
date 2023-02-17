@@ -7,6 +7,8 @@ const artist_1 = require("./artist");
 const upload_1 = require("./upload");
 const user_1 = require("./user");
 const blog_1 = require("./blog");
+const businessLeads_1 = require("./dashboard/businessLeads");
+const bookings_1 = require("./dashboard/bookings");
 const router = (0, express_1.Router)();
 exports.router = router;
 // const accessControl = (req: Request, res: Response, next: any) => {
@@ -18,4 +20,6 @@ router.use('/artist', artist_1.artistRouter);
 router.use('/admin', admin_1.adminRouter);
 router.use('/upload', upload_1.uploadRouter);
 router.use('/blog', blog_1.blogRouter);
+router.use('/businessLeads', businessLeads_1.artistBusinessLeads);
+router.use('/bookings', bookings_1.artistBooking);
 //# sourceMappingURL=index.js.map
